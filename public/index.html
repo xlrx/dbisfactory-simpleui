@@ -1,0 +1,105 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello WebSocket</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/main.css" rel="stylesheet">
+
+    <script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
+    <!-- <script src="/webjars/jquery/jquery.min.js"></script> -->
+    <!-- <script src="/webjars/sockjs-client/sockjs.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.3.0/sockjs.min.js"></script>
+    <!-- <script src="/webjars/stomp-websocket/stomp.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!-- <script src="/app.js"></script> -->
+
+
+    <script>
+        //$(function () {
+        //"use strict";
+
+        var msgs = $("#messages");
+
+        console.log(msgs);
+
+        /*function showGreeting(message) {
+            $("#greetings").append("<tr><td>" + message + "</td></tr>");
+        }*/
+
+        var ws = new WebSocket('ws://134.60.152.152:40510');
+        ws.onopen = function () {
+            console.log('websocket is connected ...');
+            ws.send('connected')
+        };
+        ws.onmessage = function (ev) {
+            console.log(ev);
+            //showGreeting(JSON.parse(ev.data).content);
+            // try to decode json (I assume that each message
+            // from server is json)
+            try {
+                var json = JSON.parse(ev.data);
+                //msgs.append(json);
+                var date = new Date(json.ts*1000);
+                $("#messages").append("<tr><td>"+date+"</td><td>"+json.station+"</td><td>"+json.variable+"</td><td>"+json.value+"</td></tr>");
+                $(document).scrollTop($(document).height());
+                //$( "#msgs" ).append( "<p>Test</p>" );
+            } catch (e) {
+                console.log('This doesn\'t look like a valid JSON: ',
+                    ev.data);
+                return;
+            }
+        }
+        //});
+    </script>
+
+
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div id="main-content" class="container">
+    <!-- <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="connect">WebSocket connection:</label>
+                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
+                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name">What is your name?</label>
+                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                </div>
+                <button id="send" class="btn btn-default" type="submit">Send</button>
+            </form>
+        </div>
+    </div> -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1>YAY – It works... kinda.</h1>
+            <table id="conversation" class="table table-striped">
+                <thead>
+                <tr>
+                    <td>Timestamp</td>
+                    <td>Station</td>
+                    <td>Variable</td>
+                    <td>Value</td>
+                </tr>
+                </thead>
+                <tbody id="messages">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
